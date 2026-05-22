@@ -18,4 +18,13 @@ module "iam" {
   project_name      = var.project_name
   oidc_provider_arn = aws_iam_openid_connect_provider.mock_eks.arn
   oidc_provider_url = aws_iam_openid_connect_provider.mock_eks.url
+module "ecr" {
+  source = "./modules/ecr"
+}
+
+module "rds" {
+  source             = "./modules/rds"
+  vpc_id             = module.vpc.vpc_id
+  private_subnet_ids = module.vpc.db_subnet_ids
+  db_password        = var.db_password
 }
