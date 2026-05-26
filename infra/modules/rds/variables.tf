@@ -13,3 +13,8 @@ variable "db_password" {
   description = "Database master password"
   sensitive   = true
 }
+
+variable "rds_sg_id" {
+  description = "RDS Security Group ID"
+  type        = string
+}
