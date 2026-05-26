@@ -20,23 +20,6 @@ resource "aws_db_parameter_group" "diary_rds_pg" {
   }
 }
 
-resource "aws_security_group" "rds_sg" {
-  name        = "team4-rds-sg"
-  vpc_id      = var.vpc_id
-
-  ingress {
-    from_port   = 3306
-    to_port     = 3306
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # 테스트용 전체 허용
-  }
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
 
 resource "aws_db_subnet_group" "rds_subnet_group" {
   name       = "team4-rds-subnet-group"
