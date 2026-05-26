@@ -32,3 +32,13 @@ output "rds_sg_id" {
   description = "RDS Security Group ID"
   value       = module.vpc.rds_sg_id
 }
+
+output "s3_bucket_name" {
+  description = "S3 버킷 이름"
+  value       = module.backend.s3_bucket_name
+}
+
+output "dynamodb_table_name" {
+  description = "DynamoDB 테이블 이름"
+  value       = module.backend.dynamodb_table_name
+}
