@@ -1,52 +1,172 @@
-data "aws_caller_identity" "current" {}
-
-locals {
-  # OIDC URL에서 "https://"를 제거해야만 AssumeRole 백엔드 조건절이 정상 작동합니다.
-  oidc_url_stripped = replace(var.oidc_provider_url, "https://", "")
-}
-
-# 1. IRSA 검증용 테스트 S3 버킷 생성
-resource "aws_s3_bucket" "irsa_test" {
-  bucket        = "${var.project_name}-irsa-test-${data.aws_caller_identity.current.account_id}"
-  force_destroy = true
-
-  tags = {
-    Name = "${var.project_name}-irsa-test"
-  }
-}
-
-# 2. 테스트 버킷 내 실습용 파일 업로드
-resource "aws_s3_object" "test_file" {
-  bucket  = aws_s3_bucket.irsa_test.bucket
-  key     = "hello.txt"
-  content = "IRSA 정상 동작 확인!"
-}
-
-# 3. EKS Pod 전용 IAM Role (IRSA) 생성
-resource "aws_iam_role" "s3_reader" {
-  name = "${var.project_name}-s3-reader-role"
+# EKS 클러스터가 AWS 리소스를 관리하기 위한 IAM Role 생성
+resource "aws_iam_role" "eks_cluster_role" {
+  name = "${var.project_name}-eks-cluster-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
+
     Statement = [{
       Effect = "Allow"
+
       Principal = {
-        Federated = var.oidc_provider_arn
+        Service = "eks.amazonaws.com"
       }
-      Action = "sts:AssumeRoleWithWebIdentity"
-      Condition = {
-        StringEquals = {
-          "${local.oidc_url_stripped}:aud" = "sts.amazonaws.com"
-          # 쿠버네티스의 default 네임스페이스 내 s3-reader-sa 서비스 어카운트에 권한 매핑
-          "${local.oidc_url_stripped}:sub" = "system:serviceaccount:default:s3-reader-sa"
-        }
-      }
+
+      Action = "sts:AssumeRole"
     }]
   })
 }
 
-# 4. IAM Role에 S3 읽기 전용 AWS 관리형 정책 연결
-resource "aws_iam_role_policy_attachment" "s3_read" {
-  role       = aws_iam_role.s3_reader.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+# EKS Cluster용 AWS 관리형 정책 연결
+resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
+  role       = aws_iam_role.eks_cluster_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
 }
+
+# EKS Worker Node(EC2)가 사용할 IAM Role 생성
+resource "aws_iam_role" "eks_node_role" {
+  name = "${var.project_name}-eks-node-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [{
+      Effect = "Allow"
+
+      Principal = {
+        Service = "ec2.amazonaws.com"
+      }
+
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+# Worker Node 정책 연결
+resource "aws_iam_role_policy_attachment" "eks_worker_node_policy" {
+  role       = aws_iam_role.eks_node_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+}
+
+# # AWS Load Balancer Controller용 IAM Role 생성
+# resource "aws_iam_role" "alb_controller" {
+#   name = "${var.project_name}-alb-controller-role"
+
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17"
+
+#     Statement = [{
+#       Effect = "Allow"
+
+#       Principal = {
+#         Federated = var.oidc_provider_arn
+#       }
+
+#       Action = "sts:AssumeRoleWithWebIdentity"
+
+#       Condition = {
+#         StringEquals = {
+#           "${replace(var.oidc_provider_url, "https://", "")}:sub" = "system:serviceaccount:kube-system:aws-load-balancer-controller"
+#         }
+#       }
+#     }]
+#   })
+# }
+
+# # ALB Controller IAM Policy 생성
+# resource "aws_iam_policy" "alb_controller_policy" {
+#   name = "${var.project_name}-alb-controller-policy"
+
+#   policy = file("${path.module}/policies/alb-controller-policy.json")
+# }
+
+# # ALB Controller Role에 정책 연결
+# resource "aws_iam_role_policy_attachment" "alb_attach" {
+#   role       = aws_iam_role.alb_controller.name
+#   policy_arn = aws_iam_policy.alb_controller_policy.arn
+# }
+
+# # VPC CNI 정책 연결
+# resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
+#   role       = aws_iam_role.eks_node_role.name
+#   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+# }
+
+# # ECR 이미지 Pull 권한 정책 연결
+# resource "aws_iam_role_policy_attachment" "eks_ecr_readonly_policy" {
+#   role       = aws_iam_role.eks_node_role.name
+#   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+# }
+
+# # GitHub Actions OIDC Provider 생성
+# resource "aws_iam_openid_connect_provider" "github" {
+#   url = "https://token.actions.githubusercontent.com"
+
+#   client_id_list = [
+#     "sts.amazonaws.com"
+#   ]
+
+#   thumbprint_list = [
+#     "6938fd4d98bab03faadb97b34396831e3780aea1"
+#   ]
+# }
+
+# # GitHub Actions가 AWS 접근 시 사용할 IAM Role 생성
+# resource "aws_iam_role" "github_actions" {
+#   name = "${var.project_name}-github-actions-role"
+
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17"
+
+#     Statement = [{
+#       Effect = "Allow"
+
+#       Principal = {
+#         Federated = aws_iam_openid_connect_provider.github.arn
+#       }
+
+#       Action = "sts:AssumeRoleWithWebIdentity"
+
+#       Condition = {
+#         StringLike = {
+#           "token.actions.githubusercontent.com:sub" = "repo:${var.github_repo}:*"
+#         }
+
+#         StringEquals = {
+#           "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+#         }
+#       }
+#     }]
+#   })
+# }
+
+# # GitHub Actions용 ECR Push 정책 생성
+# resource "aws_iam_policy" "github_actions_ecr_policy" {
+#   name = "${var.project_name}-github-actions-ecr-policy"
+
+#   policy = jsonencode({
+#     Version = "2012-10-17"
+
+#     Statement = [{
+#       Effect = "Allow"
+
+#       Action = [
+#         "ecr:GetAuthorizationToken",
+#         "ecr:BatchCheckLayerAvailability",
+#         "ecr:CompleteLayerUpload",
+#         "ecr:InitiateLayerUpload",
+#         "ecr:UploadLayerPart",
+#         "ecr:PutImage",
+#         "ecr:BatchGetImage"
+#       ]
+
+#       Resource = "*"
+#     }]
+#   })
+# }
+
+# # GitHub Actions Role에 ECR Push 정책 연결
+# resource "aws_iam_role_policy_attachment" "github_actions_attach" {
+#   role       = aws_iam_role.github_actions.name
+#   policy_arn = aws_iam_policy.github_actions_ecr_policy.arn
+# }

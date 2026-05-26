@@ -20,20 +20,23 @@ resource "aws_db_parameter_group" "diary_rds_pg" {
   }
 }
 
+
 resource "aws_db_subnet_group" "rds_subnet_group" {
   name       = "team4-rds-subnet-group"
   subnet_ids = var.private_subnet_ids
 }
 
 resource "aws_db_instance" "diary_db" {
-  allocated_storage      = 20
-  max_allocated_storage  = 100
-  engine                 = "mysql"
-  engine_version         = "8.0"
-  instance_class         = "db.t3.micro"
-  db_name                = "diarydb"
-  username               = "admin"
-  password               = var.db_password
+  allocated_storage     = 20
+  max_allocated_storage = 100
+  engine                = "mysql"
+  engine_version        = "8.0"
+  instance_class        = "db.t3.micro"
+
+  db_name  = "diarydb"
+  username = "admin"
+  password = var.db_password
+
   port                   = 3306
   parameter_group_name   = aws_db_parameter_group.diary_rds_pg.name
   db_subnet_group_name   = aws_db_subnet_group.rds_subnet_group.name
