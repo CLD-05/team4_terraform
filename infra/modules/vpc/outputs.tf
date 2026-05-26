@@ -18,9 +18,9 @@ output "db_subnet_ids" {
   value       = aws_subnet.db[*].id
 }
 
-output "nat_gateway_id" {
-  description = "NAT Gateway ID"
-  value       = aws_nat_gateway.main.id
+output "nat_gateway_ids" {
+  description = "NAT Gateway ID 목록"
+  value       = aws_nat_gateway.main[*].id
 }
 
 output "alb_sg_id" {
