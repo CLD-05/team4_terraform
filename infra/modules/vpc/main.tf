@@ -131,3 +131,97 @@ resource "aws_route_table_association" "db" {
   subnet_id      = aws_subnet.db[count.index].id
   route_table_id = aws_route_table.private.id
 }
+
+# ALB Security Group (외부 인터넷 → ALB)
+resource "aws_security_group" "alb" {
+  name        = "${var.project_name}-alb-sg"
+  description = "ALB Security Group"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    description = "HTTP from internet"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "HTTPS from internet"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.project_name}-alb-sg"
+  }
+}
+
+# EKS 노드 Security Group (ALB → EKS)
+resource "aws_security_group" "eks_node" {
+  name        = "${var.project_name}-eks-node-sg"
+  description = "EKS Node Security Group"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    description     = "Traffic from ALB"
+    from_port       = 0
+    to_port         = 65535
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb.id]
+  }
+
+  ingress {
+    description = "Node to node communication"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    self        = true
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.project_name}-eks-node-sg"
+  }
+}
+
+# RDS Security Group (EKS → RDS)
+resource "aws_security_group" "rds" {
+  name        = "${var.project_name}-rds-sg"
+  description = "RDS Security Group"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    description     = "MySQL from EKS nodes"
+    from_port       = 3306
+    to_port         = 3306
+    protocol        = "tcp"
+    security_groups = [aws_security_group.eks_node.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.project_name}-rds-sg"
+  }
+}

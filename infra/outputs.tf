@@ -17,3 +17,18 @@ output "db_subnet_ids" {
   description = "DB Subnet ID 목록"
   value       = module.vpc.db_subnet_ids
 }
+
+output "alb_sg_id" {
+  description = "ALB Security Group ID"
+  value       = module.vpc.alb_sg_id
+}
+
+output "eks_node_sg_id" {
+  description = "EKS Node Security Group ID"
+  value       = module.vpc.eks_node_sg_id
+}
+
+output "rds_sg_id" {
+  description = "RDS Security Group ID"
+  value       = module.vpc.rds_sg_id
+}
