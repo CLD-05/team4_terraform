@@ -20,6 +20,7 @@ module "iam" {
   oidc_provider_url = aws_iam_openid_connect_provider.mock_eks.url
 module "ecr" {
   source = "./modules/ecr"
+  }
 }
 
 module "rds" {
