@@ -47,3 +47,8 @@ module "eks" {
     "arn:aws:iam::194722398200:user/team4-h",
   ]
 }
+
+module "s3" {
+  source       = "./modules/s3"
+  project_name = var.project_name
+}
