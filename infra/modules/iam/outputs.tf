@@ -11,6 +11,10 @@ output "eks_node_role_arn" {
 #   value = aws_iam_role.alb_controller.arn
 # }
 
-# output "github_actions_role_arn" {
-#   value = aws_iam_role.github_actions.arn
-# }
+output "github_actions_role_arn" {
+  value = aws_iam_role.github_actions.arn
+}
+
+output "diary_app_irsa_role_arn" {
+  value = aws_iam_role.diary_app_irsa.arn
+}
