@@ -6,7 +6,7 @@ resource "aws_ecr_repository" "backend_api" {
     scan_on_push = true
   }
   tags = {
-    "Team" = "team4"
+    team = "team4"
   }
-  
+
 }
