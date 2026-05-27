@@ -213,7 +213,6 @@ resource "aws_security_group" "eks_node" {
   }
 }
 
-# RDS Security Group (EKS → RDS)
 resource "aws_security_group" "rds" {
   name        = "${var.project_name}-rds-sg"
   description = "RDS Security Group"
@@ -225,6 +224,15 @@ resource "aws_security_group" "rds" {
     to_port         = 3306
     protocol        = "tcp"
     security_groups = [aws_security_group.eks_node.id]
+  }
+
+  # EKS 클러스터 자동 생성 SG 추가
+  ingress {
+    description = "MySQL from EKS cluster SG"
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16"]
   }
 
   egress {
