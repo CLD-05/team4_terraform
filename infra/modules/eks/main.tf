@@ -38,3 +38,22 @@ resource "aws_eks_node_group" "main" {
     Name = "${var.cluster_name}-node-group"
   })
 }
+
+# 팀원 kubectl 접근 권한 설정
+resource "aws_eks_access_entry" "team" {
+  count         = length(var.team_iam_users)
+  cluster_name  = aws_eks_cluster.main.name
+  principal_arn = var.team_iam_users[count.index]
+  type          = "STANDARD"
+}
+
+resource "aws_eks_access_policy_association" "team" {
+  count         = length(var.team_iam_users)
+  cluster_name  = aws_eks_cluster.main.name
+  principal_arn = var.team_iam_users[count.index]
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+
+  access_scope {
+    type = "cluster"
+  }
+}
