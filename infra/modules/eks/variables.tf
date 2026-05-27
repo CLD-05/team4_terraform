@@ -63,3 +63,9 @@ variable "cluster_endpoint_public_access" {
   type        = bool
   default     = true
 }
+
+variable "team_iam_users" {
+  description = "Team member IAM user ARN list for EKS cluster access"
+  type        = list(string)
+  default     = []
+}
