@@ -86,17 +86,17 @@ resource "aws_iam_role_policy_attachment" "eks_worker_node_policy" {
 #   policy_arn = aws_iam_policy.alb_controller_policy.arn
 # }
 
-# # VPC CNI 정책 연결
-# resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
-#   role       = aws_iam_role.eks_node_role.name
-#   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-# }
+# VPC CNI 정책 연결
+resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
+  role       = aws_iam_role.eks_node_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+}
 
-# # ECR 이미지 Pull 권한 정책 연결
-# resource "aws_iam_role_policy_attachment" "eks_ecr_readonly_policy" {
-#   role       = aws_iam_role.eks_node_role.name
-#   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-# }
+# ECR 이미지 Pull 권한 정책 연결
+resource "aws_iam_role_policy_attachment" "eks_ecr_readonly_policy" {
+  role       = aws_iam_role.eks_node_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
 
 # # GitHub Actions OIDC Provider 생성
 # resource "aws_iam_openid_connect_provider" "github" {
