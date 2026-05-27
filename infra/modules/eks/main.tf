@@ -10,6 +10,11 @@ resource "aws_eks_cluster" "main" {
   role_arn = var.cluster_role_arn
   version  = var.kubernetes_version
 
+  access_config {
+    authentication_mode                         = "API_AND_CONFIG_MAP"
+    bootstrap_cluster_creator_admin_permissions = true
+  }
+
   vpc_config {
     subnet_ids              = var.private_subnet_ids
     security_group_ids      = [var.eks_node_sg_id]
@@ -51,7 +56,7 @@ resource "aws_eks_access_entry" "team" {
 resource "aws_eks_access_policy_association" "team" {
   count         = length(var.team_iam_users)
   cluster_name  = aws_eks_cluster.main.name
-  principal_arn = var.team_iam_users[count.index]
+  principal_arn = aws_eks_access_entry.team[count.index].principal_arn
   policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
 
   access_scope {
