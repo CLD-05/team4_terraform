@@ -11,7 +11,7 @@ resource "aws_vpc" "main" {
 
   tags = {
     Name = "${var.project_name}-vpc"
-    Team = "team4"
+    team = "team4"
   }
 }
 
@@ -26,7 +26,7 @@ resource "aws_subnet" "public" {
   tags = {
     Name                     = "${var.project_name}-public-${count.index + 1}"
     "kubernetes.io/role/elb" = "1"
-    Team                     = "team4"
+    team                     = "team4"
   }
 }
 
@@ -40,7 +40,7 @@ resource "aws_subnet" "private" {
   tags = {
     Name                              = "${var.project_name}-private-${count.index + 1}"
     "kubernetes.io/role/internal-elb" = "1"
-    Team                              = "team4"
+    team                              = "team4"
   }
 }
 
@@ -53,7 +53,7 @@ resource "aws_subnet" "db" {
 
   tags = {
     Name = "${var.project_name}-db-${count.index + 1}"
-    Team = "team4"
+    team = "team4"
   }
 }
 
@@ -63,7 +63,7 @@ resource "aws_internet_gateway" "main" {
 
   tags = {
     Name = "${var.project_name}-igw"
-    Team = "team4"
+    team = "team4"
   }
 }
 
@@ -74,7 +74,7 @@ resource "aws_eip" "nat" {
 
   tags = {
     Name = "${var.project_name}-nat-eip-${count.index + 1}"
-    Team = "team4"
+    team = "team4"
   }
 }
 
@@ -86,7 +86,7 @@ resource "aws_nat_gateway" "main" {
 
   tags = {
     Name = "${var.project_name}-nat-${count.index + 1}"
-    Team = "team4"
+    team = "team4"
   }
 
   depends_on = [aws_internet_gateway.main]
@@ -103,7 +103,7 @@ resource "aws_route_table" "public" {
 
   tags = {
     Name = "${var.project_name}-public-rt"
-    Team = "team4"
+    team = "team4"
   }
 }
 
@@ -119,7 +119,7 @@ resource "aws_route_table" "private" {
 
   tags = {
     Name = "${var.project_name}-private-rt-${count.index + 1}"
-    Team = "team4"
+    team = "team4"
   }
 }
 
@@ -209,7 +209,7 @@ resource "aws_security_group" "eks_node" {
 
   tags = {
     Name = "${var.project_name}-eks-node-sg"
-    Team = "team4"
+    team = "team4"
   }
 }
 
@@ -236,6 +236,6 @@ resource "aws_security_group" "rds" {
 
   tags = {
     Name = "${var.project_name}-rds-sg"
-    Team = "team4"
+    team = "team4"
   }
 }
