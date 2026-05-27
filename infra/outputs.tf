@@ -42,3 +42,13 @@ output "dynamodb_table_name" {
   description = "DynamoDB 테이블 이름"
   value       = module.backend.dynamodb_table_name
 }
+
+output "cloudfront_domain" {
+  description = "CloudFront 도메인 (이미지 URL)"
+  value       = module.s3.cloudfront_domain
+}
+
+output "diary_bucket_name" {
+  description = "이미지 저장 S3 버킷 이름"
+  value       = module.s3.bucket_name
+}
