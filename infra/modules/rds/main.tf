@@ -20,13 +20,14 @@ resource "aws_db_parameter_group" "diary_rds_pg" {
   }
 }
 
-
 resource "aws_db_subnet_group" "rds_subnet_group" {
   name       = "team4-rds-subnet-group"
   subnet_ids = var.private_subnet_ids
 }
 
 resource "aws_db_instance" "diary_db" {
+  identifier            = "team4-rds"
+  apply_immediately     = true
   allocated_storage     = 20
   max_allocated_storage = 100
   engine                = "mysql"
@@ -34,7 +35,7 @@ resource "aws_db_instance" "diary_db" {
   instance_class        = "db.t3.micro"
 
   db_name  = "diarydb"
-  username = "admin"
+  username = "admin" # root 사용 불가로 admin 설정
   password = var.db_password
 
   port                   = 3306
@@ -43,4 +44,8 @@ resource "aws_db_instance" "diary_db" {
   vpc_security_group_ids = [var.rds_sg_id]
   skip_final_snapshot    = true
   publicly_accessible    = false
+
+  tags = {
+    team = "team4"
+  }
 }

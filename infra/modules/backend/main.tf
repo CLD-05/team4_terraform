@@ -50,5 +50,6 @@ resource "aws_dynamodb_table" "terraform_lock" {
 
   tags = {
     Name = "${var.project_name}-terraform-lock"
+    team = "team4"
   }
 }

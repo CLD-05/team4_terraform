@@ -5,4 +5,8 @@ resource "aws_ecr_repository" "backend_api" {
   image_scanning_configuration {
     scan_on_push = true
   }
+  tags = {
+    team = "team4"
+  }
+
 }
