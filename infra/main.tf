@@ -34,4 +34,13 @@ module "eks" {
   eks_node_sg_id     = module.vpc.eks_node_sg_id
   cluster_role_arn   = module.iam.eks_cluster_role_arn
   node_role_arn      = module.iam.eks_node_role_arn
+  team_iam_users = [
+    "arn:aws:iam::194722398200:user/team4-ksc",
+    "arn:aws:iam::194722398200:user/team4-lsh",
+    "arn:aws:iam::194722398200:user/team4-cmk",
+    "arn:aws:iam::194722398200:user/team4-kwh",
+    "arn:aws:iam::194722398200:user/team4-ldj",
+    "arn:aws:iam::194722398200:user/team4-ljh",
+    "arn:aws:iam::194722398200:user/team4-h",
+  ]
 }

@@ -63,3 +63,9 @@ variable "cluster_endpoint_public_access" {
   type        = bool
   default     = true
 }
+
+variable "team_iam_users" {
+  description = "팀원 IAM User ARN 목록"
+  type        = list(string)
+  default     = []
+}
