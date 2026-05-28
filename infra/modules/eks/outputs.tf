@@ -32,3 +32,8 @@ output "eks_node_sg_id" {
   description = "Security group ID used by the EKS module"
   value       = var.eks_node_sg_id
 }
+
+output "cluster_oidc_provider_arn" {
+  description = "EKS OIDC Provider ARN"
+  value       = "arn:aws:iam::194722398200:oidc-provider/${replace(aws_eks_cluster.main.identity[0].oidc[0].issuer, "https://", "")}"
+}
