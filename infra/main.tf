@@ -55,5 +55,4 @@ module "irsa" {
   source            = "./modules/irsa"
   project_name      = var.project_name
   oidc_provider_url = module.eks.cluster_oidc_issuer_url
-  diary_bucket_arn  = module.s3.bucket_arn
 }
