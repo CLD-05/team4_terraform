@@ -31,16 +31,19 @@ resource "aws_iam_role" "eks_node_role" {
   })
 }
 
+# Worker Node 정책 연결
 resource "aws_iam_role_policy_attachment" "eks_worker_node_policy" {
   role       = aws_iam_role.eks_node_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
 }
 
+# VPC CNI 정책 연결
 resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
   role       = aws_iam_role.eks_node_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
 }
 
+# ECR 이미지 Pull 권한 정책 연결
 resource "aws_iam_role_policy_attachment" "eks_ecr_readonly_policy" {
   role       = aws_iam_role.eks_node_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
@@ -104,11 +107,11 @@ resource "aws_iam_role" "github_actions" {
       }
       Action = "sts:AssumeRoleWithWebIdentity"
       Condition = {
-        StringLike = {
-          "token.actions.githubusercontent.com:sub" = "repo:${var.github_repo}:*"
-        }
         StringEquals = {
           "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+        }
+        StringLike = {
+          "token.actions.githubusercontent.com:sub" = "repo:${var.github_repo}:*"
         }
       }
     }]

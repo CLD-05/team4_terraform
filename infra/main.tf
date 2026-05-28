@@ -24,7 +24,7 @@ module "backend" {
 module "iam" {
   source            = "./modules/iam"
   project_name      = var.project_name
-  github_repo       = "CLD-05/team4_terraform"
+  github_repo       = "CLD-05/team4_app"
   oidc_provider_url = module.eks.cluster_oidc_issuer_url
   oidc_provider_arn = module.eks.cluster_oidc_provider_arn
 }
@@ -51,4 +51,10 @@ module "eks" {
 module "s3" {
   source       = "./modules/s3"
   project_name = var.project_name
+}
+
+module "irsa" {
+  source            = "./modules/irsa"
+  project_name      = var.project_name
+  oidc_provider_url = module.eks.cluster_oidc_issuer_url
 }
