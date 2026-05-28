@@ -22,11 +22,11 @@ module "backend" {
 }
 
 module "iam" {
-  source       = "./modules/iam"
-  project_name = var.project_name
-  github_repo  = "CLD-05/team4_terraform"
-
+  source            = "./modules/iam"
+  project_name      = var.project_name
+  github_repo       = "CLD-05/team4_terraform"
   oidc_provider_url = module.eks.cluster_oidc_issuer_url
+  oidc_provider_arn = module.eks.cluster_oidc_provider_arn
 }
 
 module "eks" {
