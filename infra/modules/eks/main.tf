@@ -1,7 +1,7 @@
 locals {
   common_tags = {
     Project = var.cluster_name
-    Team    = "team4"
+    team    = "team4"
   }
 }
 
