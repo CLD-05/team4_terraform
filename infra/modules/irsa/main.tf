@@ -54,72 +54,72 @@ resource "aws_iam_role_policy_attachment" "alb_attach" {
   policy_arn = aws_iam_policy.alb_controller_policy.arn
 }
 
-# Diary App Pod가 S3에 접근하기 위한 IRSA Role 생성
-# resource "aws_iam_role" "diary_app_irsa" {
-#   name = "${var.project_name}-diary-app-irsa"
+#Diary App Pod가 S3에 접근하기 위한 IRSA Role 생성
+resource "aws_iam_role" "diary_app_irsa" {
+  name = "${var.project_name}-diary-app-irsa"
 
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
 
-#     Statement = [{
-#       Effect = "Allow"
+    Statement = [{
+      Effect = "Allow"
 
-#       Principal = {
-#         Federated = aws_iam_openid_connect_provider.eks.arn
-#       }
+      Principal = {
+        Federated = aws_iam_openid_connect_provider.eks.arn
+      }
 
-#       Action = "sts:AssumeRoleWithWebIdentity"
+      Action = "sts:AssumeRoleWithWebIdentity"
 
-#       Condition = {
-#         StringEquals = {
-#           "${local.oidc_provider_host}:aud" = "sts.amazonaws.com"
-#         }
+      Condition = {
+        StringEquals = {
+          "${local.oidc_provider_host}:aud" = "sts.amazonaws.com"
+        }
 
-#         StringLike = {
-#           "${local.oidc_provider_host}:sub" = [
-#             for namespace in var.app_namespaces :
-#             "system:serviceaccount:${namespace}:${var.app_service_account_name}"
-#           ]
-#         }
-#       }
-#     }]
-#   })
-# }
+        StringLike = {
+          "${local.oidc_provider_host}:sub" = [
+            for namespace in var.app_namespaces :
+            "system:serviceaccount:${namespace}:${var.app_service_account_name}"
+          ]
+        }
+      }
+    }]
+  })
+}
 
-# Diary App S3 접근 정책 생성
-# resource "aws_iam_policy" "diary_app_s3_policy" {
-#   name = "${var.project_name}-diary-app-s3-policy"
+#Diary App S3 접근 정책 생성
+resource "aws_iam_policy" "diary_app_s3_policy" {
+  name = "${var.project_name}-diary-app-s3-policy"
 
-#   policy = jsonencode({
-#     Version = "2012-10-17"
+  policy = jsonencode({
+    Version = "2012-10-17"
 
-#     Statement = [
-#       {
-#         Effect = "Allow"
+    Statement = [
+      {
+        Effect = "Allow"
 
-#         Action = [
-#           "s3:ListBucket"
-#         ]
+        Action = [
+          "s3:ListBucket"
+        ]
 
-#         Resource = var.diary_bucket_arn
-#       },
-#       {
-#         Effect = "Allow"
+        Resource = var.diary_bucket_arn
+      },
+      {
+        Effect = "Allow"
 
-#         Action = [
-#           "s3:GetObject",
-#           "s3:PutObject",
-#           "s3:DeleteObject"
-#         ]
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
 
-#         Resource = "${var.diary_bucket_arn}/*"
-#       }
-#     ]
-#   })
-# }
+        Resource = "${var.diary_bucket_arn}/*"
+      }
+    ]
+  })
+}
 
-# Diary App IRSA Role에 S3 정책 연결
-# resource "aws_iam_role_policy_attachment" "diary_app_s3_attach" {
-#   role       = aws_iam_role.diary_app_irsa.name
-#   policy_arn = aws_iam_policy.diary_app_s3_policy.arn
-# }
+#Diary App IRSA Role에 S3 정책 연결
+resource "aws_iam_role_policy_attachment" "diary_app_s3_attach" {
+  role       = aws_iam_role.diary_app_irsa.name
+  policy_arn = aws_iam_policy.diary_app_s3_policy.arn
+}

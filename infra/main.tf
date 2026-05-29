@@ -55,4 +55,13 @@ module "irsa" {
   source            = "./modules/irsa"
   project_name      = var.project_name
   oidc_provider_url = module.eks.cluster_oidc_issuer_url
+  diary_bucket_arn  = "arn:aws:s3:::team4-diary-images"
+}
+
+module "route53" {
+  source       = "./modules/route53"
+  project_name = var.project_name
+  domain_name  = "singleuser.cloud"
+  alb_dns_name = "team4-diaryapp-prod-alb-2026376833.ap-northeast-2.elb.amazonaws.com"
+  alb_zone_id  = "ZWKZPGTI48KDX"
 }
