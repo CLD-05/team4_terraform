@@ -9,12 +9,3 @@ variable "project_name" {
   description = "프로젝트 이름"
 }
 
-variable "alb_dns_name" {
-  type        = string
-  description = "ALB DNS 이름"
-}
-
-variable "alb_zone_id" {
-  type        = string
-  description = "ALB Zone ID"
-}

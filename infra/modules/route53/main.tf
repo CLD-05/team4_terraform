@@ -1,3 +1,7 @@
+# ALB DNS 자동으로 가져오기
+data "aws_lb" "prod_alb" {
+  name = "team4-diaryapp-prod-alb"
+}
 # Route53 호스팅 영역 생성
 resource "aws_route53_zone" "main" {
   name = var.domain_name
@@ -15,8 +19,8 @@ resource "aws_route53_record" "main" {
   type    = "A"
 
   alias {
-    name                   = var.alb_dns_name
-    zone_id                = var.alb_zone_id
+    name                   = data.aws_lb.prod_alb.dns_name # ← 자동 참조
+    zone_id                = data.aws_lb.prod_alb.zone_id  # ← zone_id도 자동 참조
     evaluate_target_health = true
   }
 }
@@ -28,8 +32,8 @@ resource "aws_route53_record" "www" {
   type    = "A"
 
   alias {
-    name                   = var.alb_dns_name
-    zone_id                = var.alb_zone_id
+    name                   = data.aws_lb.prod_alb.dns_name # ← 자동 참조
+    zone_id                = data.aws_lb.prod_alb.zone_id  # ← zone_id도 자동 참조
     evaluate_target_health = true
   }
 }

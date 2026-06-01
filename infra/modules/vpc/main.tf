@@ -24,9 +24,10 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name                     = "${var.project_name}-public-${count.index + 1}"
-    "kubernetes.io/role/elb" = "1"
-    team                     = "team4"
+    Name                                  = "${var.project_name}-public-${count.index + 1}"
+    "kubernetes.io/role/elb"              = "1"
+    "kubernetes.io/cluster/team4-cluster" = "shared"
+    team                                  = "team4"
   }
 }
 
@@ -175,6 +176,7 @@ resource "aws_security_group" "alb" {
 
   tags = {
     Name = "${var.project_name}-alb-sg"
+    team = "team4"
   }
 }
 
